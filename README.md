@@ -2,9 +2,44 @@
 
 Simple Fractal Rendering program
 
+![Mandelbrot](doc/mandelbrot.png)
+
 ## Usage
 
-Coming soon...
+Use
+```bash
+Insula -h
+```
+to see the list of available command line arguments.
+
+The input file has the following format:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<scene>
+	<parameters>
+		<filename>...</filename>
+		<type>Type</type>
+		<imgWidth>Width</imgWidth>
+		<imgHeight>Height</imgHeight>
+	</parameters>
+	...objects...
+</scene>
+```
+Currently the only available type is `Mandelbrot`. In which case a
+`<Mandelbrot>` object must be supplied. It has the following format
+```xml
+<Mandelbrot>
+	<centreX>...</centreX>
+	<centreY>...</centreY>
+	<radius>...</radius>
+	<iterations>...</iterations>
+	<escapeRadius>...</escapeRadius>
+	<cycles>...</cycles>
+</Mandelbrot>
+```
+Note: All arguments except for `<type>` have default values.
+
+For example of usage, see `doc/examples`.
 
 ## Building
 

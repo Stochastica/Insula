@@ -39,8 +39,6 @@ void render(Image* const image, TaskParameters const& pp,
 	int nBlocksY = image->height / pp.bucketSize + 1;
 	ThreadPool<Block> tp(bucket, nBlocksX * nBlocksY, pp.nThreads);
 
-	std::cout << "Generating Blocks\n";
-
 	int blockX[nBlocksX + 1];
 	int blockY[nBlocksY + 1];
 	{
@@ -67,8 +65,6 @@ void render(Image* const image, TaskParameters const& pp,
 	tp.start();
 	while (!tp.tasksEmpty())
 		std::this_thread::yield();
-
-	std::cout << "Complete\n";
 
 	tp.halt();
 }

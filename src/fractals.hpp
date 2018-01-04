@@ -35,10 +35,12 @@ class Mandelbrot final: public PixelProvider
 {
 public:
 	Mandelbrot(int imgWidth, int imgHeight,
-	           complex min, complex max, int iterations):
+	           complex min, complex max,
+	           int iterations, int cycles, real escapeRadius):
 	  imgWidth(imgWidth), imgHeight(imgHeight),
 	  min(min), max(max),
-	  iterations(iterations)
+	  iterations(iterations), cycles(cycles),
+	  escapeRadius(escapeRadius)
 	{
 	}
 
@@ -50,6 +52,8 @@ private:
 	int imgWidth, imgHeight;
 	complex min, max;
 	int iterations;
+	int cycles;
+	real escapeRadius;
 };
 
 } // namespace ins

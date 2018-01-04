@@ -33,7 +33,7 @@ bool processFile(
 	bpt::ptree tree;
 	bpt::read_xml(file.c_str(), tree);
 
-	int i = 0;
+	int i = 0; // Scene id
 
 	for (auto const& scene: tree)
 	{
@@ -44,6 +44,7 @@ bool processFile(
 		}
 
 		std::string fileName;
+		std::string type; // Scene type
 		Image image;
 		// Load image
 		{
@@ -53,45 +54,53 @@ bool processFile(
 			image.height = 600;
 			if (parameters)
 			{
-				fileName = scene.second.get<std::string>("filename", fileName);
-				image.width = scene.second.get<int>("imgWidth", image.width);
-				image.height = scene.second.get<int>("imgHeight", image.height);
+				fileName = parameters->get<std::string>("filename", fileName);
+				type = parameters->get<std::string>("type", type);
+				image.width = parameters->get<int>("imgWidth", image.width);
+				image.height = parameters->get<int>("imgHeight", image.height);
 			}
 			image.pixelsR = new uint8_t[image.width * image.height];
 			image.pixelsG = new uint8_t[image.width * image.height];
 			image.pixelsB = new uint8_t[image.width * image.height];
 			image.pixelsA = new uint8_t[image.width * image.height];
 		}
-		std::cout << "Scene name: " << fileName << std::endl;
+		std::cout << "Scene name: " << fileName
+			<< ", Type: " << type << std::endl;
 
 		typedef boost::gil::rgba8_image_t::value_type Pixel;
 		static_assert(sizeof(Pixel) == sizeof(uint32_t), "Must be of RGBA8 format");
 
-		for (auto const& object: scene.second)
+		if (type == "Mandelbrot")
 		{
-			if (object.first == "Mandelbrot")
-			{
-				real centreX = object.second.get<real>("centreX");
-				real centreY = object.second.get<real>("centreY");
-				real diffX = object.second.get<real>("diffX");
-				real diffY = object.second.get<real>("diffY");
-				int iterations = object.second.get<int>("iterations", 1024);
+			real centreX = -.7;
+			real centreY = 0;
+			real radius = 1.5;
+			int iterations = 64;
+			int cycles = 16;
+			real escapeRadius = 20;
 
-				Mandelbrot m = Mandelbrot(image.width, image.height,
-				                          complex(centreX - diffX, centreY - diffY),
-				                          complex(centreX + diffX, centreY + diffY),
-				                          iterations);
-				render(&image, pp, &m);
-
-				goto write;
-			}
-			else if (object.first != "parameters")
+			if (auto tree = scene.second.get_child_optional("Mandelbrot"))
 			{
-				std::cerr << "Warning: Unknown object " << object.first << std::endl;
+				centreX = tree->get<real>("centreX", centreX);
+				centreY = tree->get<real>("centreY", centreY);
+				radius = tree->get<real>("radius", radius);
+				iterations = tree->get<int>("iterations", iterations);
+				cycles = tree->get<int>("cycles", cycles);
+				escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
 			}
+			real diffY = radius * (image.height / (real) image.width);
+			Mandelbrot m = Mandelbrot(image.width, image.height,
+			                          complex(centreX - radius, centreY - diffY),
+			                          complex(centreX + radius, centreY + diffY),
+			                          iterations, cycles, escapeRadius);
+			render(&image, pp, &m);
+		}
+		else
+		{
+			std::cerr << "Unknown Scene type\n";
+			continue;
 		}
 
-write:
 		boost::gil::png_write_view((outputDir / fileName).string(),
 		                           boost::gil::planar_rgba_view(image.width,
 		                               image.height,
@@ -106,6 +115,7 @@ write:
 		delete[] image.pixelsG;
 		delete[] image.pixelsB;
 		delete[] image.pixelsA;
+		++i;
 	}
 
 	return true;
@@ -148,6 +158,12 @@ int main(int argc, char* argv[])
 	}
 
 	auto output = boost::filesystem::path(options["output"].as<std::string>());
+
+	if (!boost::filesystem::exists(output))
+	{
+		std::cerr << "Output Directory does not exist. Halt/\n";
+		return EXIT_FAILURE;
+	}
 	auto input = boost::filesystem::path(options["input"].as<std::string>());
 
 	TaskParameters pp;

@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <scene>
 	<parameters>
-		<filename>2.png</filename>
+		<filename>mandelbrot.png</filename>
+		<type>Mandelbrot</type>
+		<imgWidth>800</imgWidth>
+		<imgHeight>600</imgHeight>
+	</parameters>
+	<Mandelbrot>
+		<iterations>1024</iterations>
+		<escapeRadius>1048576</escapeRadius>
+		<cycles>32</cycles>
+	</Mandelbrot>
+</scene>
+<scene>
+	<parameters>
+		<filename>zoomed.png</filename>
+		<type>Mandelbrot</type>
 		<imgWidth>800</imgWidth>
 		<imgHeight>600</imgHeight>
 	</parameters>
 	<Mandelbrot>
 		<centreX>0.16125</centreX>
 		<centreY>0.638438</centreY>
-		<diffX>0.008</diffX>
-		<diffY>0.006</diffY>
+		<radius>0.02</radius>
 	</Mandelbrot>
 </scene>
