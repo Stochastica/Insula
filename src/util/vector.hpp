@@ -1,15 +1,48 @@
 #ifndef INSULA_UTIL_VECTOR_HPP_
 #define INSULA_UTIL_VECTOR_HPP_
 
-#include <Eigen/Dense>
-
 #include "../core/insula.hpp"
 
 namespace ins
 {
 
-typedef Eigen::Vector2i Vector2i;
-typedef Eigen::Matrix<real, 4, 1> Color4;
+template <typename F>
+class Vector2 final
+{
+public:
+	Vector2() = default;
+	Vector2(F x, F y) { e[0] = x; e[1] = y; }
+
+	F& x() noexcept { return e[0]; }
+	F x() const noexcept { return e[0]; }
+	F& y() noexcept { return e[1]; }
+	F y() const noexcept { return e[1]; }
+private:
+	F e[2];
+};
+
+template <typename F>
+class Vector4 final
+{
+public:
+	Vector4();
+	Vector4(F a, F b, F c, F d)
+	{
+		e[0] = a;
+		e[1] = b;
+		e[2] = c;
+		e[3] = d;
+	}
+
+	F& operator()(int i) noexcept { return e[i]; }
+	F operator()(int i) const noexcept { return e[i]; }
+private:
+	F e[4];
+};
+
+
+typedef Vector2<int> Vector2i;
+typedef Vector4<real> Color4;
 
 } // namespace ins
 

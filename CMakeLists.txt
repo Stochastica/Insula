@@ -7,7 +7,7 @@ set(CMAKE_BINARY_DIR   ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR})
 
-find_package(Boost 1.61.0 COMPONENTS
+find_package(Boost 1.58.0 COMPONENTS
 	filesystem
 	program_options
 	system
@@ -23,10 +23,6 @@ find_package(PNG REQUIRED)
 if (${PNG_FOUND})
 	include_directories(${PNG_INCLUDE_DIRS})
 endif()
-
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
 set(FileSource
 	src/main.cpp
 	src/fractals.cpp
