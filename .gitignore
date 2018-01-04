@@ -1,0 +1,14 @@
+# All hidden files with exceptions
+.*
+!/.gitignore
+
+# Caches
+*.o
+*.swp
+
+# Directories
+bin
+build
+
+# Special
+compile_commands.json

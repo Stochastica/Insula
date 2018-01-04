@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scene>
+	<parameters>
+		<filename>2.png</filename>
+		<imgWidth>800</imgWidth>
+		<imgHeight>600</imgHeight>
+	</parameters>
+	<Mandelbrot>
+		<centreX>0.16125</centreX>
+		<centreY>0.638438</centreY>
+		<diffX>0.008</diffX>
+		<diffY>0.006</diffY>
+	</Mandelbrot>
+</scene>
