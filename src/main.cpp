@@ -14,8 +14,8 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io/png_io.hpp>
 
-#include "fractals.hpp"
 #include "integration.hpp"
+#include "scene/Mandelbrot.hpp"
 
 #define EXIT_NORMAL 0
 #define EXIT_FAILURE 1
@@ -93,7 +93,8 @@ bool processFile(
 			                          complex(centreX - radius, centreY - diffY),
 			                          complex(centreX + radius, centreY + diffY),
 			                          iterations, cycles, escapeRadius);
-			render(&image, pp, &m);
+			Sampler s = Sampler(image.width, image.height, &m);
+			render(&image, pp, &s);
 		}
 		else
 		{

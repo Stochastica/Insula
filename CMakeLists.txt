@@ -25,8 +25,8 @@ if (${PNG_FOUND})
 endif()
 set(FileSource
 	src/main.cpp
-	src/fractals.cpp
 	src/integration.cpp
+	src/scene/Mandelbrot.cpp
 	)
 
 add_executable(Insula ${FileSource})
@@ -44,6 +44,5 @@ target_compile_features(Insula PRIVATE
 	cxx_auto_type
 	cxx_constexpr
 	cxx_lambdas
-	cxx_relaxed_constexpr
 	)
 

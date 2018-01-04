@@ -8,30 +8,36 @@
 namespace ins
 {
 
+Color4 Sampler::at(Vector2i const& v) const
+{
+	complex z(
+	  v.x() / (real) width,
+	  v.y() / (real) height
+	);
+	return scene->sample(z);
+}
 void render(Image* const image, TaskParameters const& pp,
-            PixelProvider* const provider)
+            Sampler* const sampler)
 {
 	assert(image->width > 0 && image->height > 0);
 	assert(pp.bucketSize > 0);
 
 	struct Block
 	{
-		Image* image;
-		PixelProvider* provider;
 		int x0, x1, y0, y1;
 	};
-	auto bucket = [](Block b)
+	auto bucket = [image, sampler](Block b)
 	{
 		for (int x = b.x0; x < b.x1; ++x)
 			for (int y = b.y0; y < b.y1; ++y)
 			{
-				assert(x + y * b.image->width < b.image->width * b.image->height);
-				Color4 pixel = b.provider->pixel(Vector2i(x, y));
-				int i = y * b.image->width + x;
-				b.image->pixelsR[i] = (uint8_t) (pixel(0) * 0xFF);
-				b.image->pixelsG[i] = (uint8_t) (pixel(1) * 0xFF);
-				b.image->pixelsB[i] = (uint8_t) (pixel(2) * 0xFF);
-				b.image->pixelsA[i] = 0xFF;
+				assert(x + y * image->width < image->width * image->height);
+				Color4 pixel = sampler->at(Vector2i(x, y));
+				int i = y * image->width + x;
+				image->pixelsR[i] = (uint8_t)(pixel(0) * 0xFF);
+				image->pixelsG[i] = (uint8_t)(pixel(1) * 0xFF);
+				image->pixelsB[i] = (uint8_t)(pixel(2) * 0xFF);
+				image->pixelsA[i] = 0xFF;
 			}
 	};
 
@@ -53,8 +59,6 @@ void render(Image* const image, TaskParameters const& pp,
 		for (int j = 0; j < nBlocksY; ++j)
 		{
 			Block b;
-			b.image = image;
-			b.provider = provider;
 			b.x0 = blockX[i];
 			b.x1 = blockX[i + 1];
 			b.y0 = blockY[j];
