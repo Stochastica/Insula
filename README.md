@@ -1,6 +1,6 @@
 # Insula
 
-Simple Fractal Rendering program
+Simple Multi-threaded Fractal Rendering program
 
 ![Mandelbrot](doc/mandelbrot.png)
 
@@ -10,7 +10,12 @@ Use
 ```bash
 Insula -h
 ```
-to see the list of available command line arguments.
+to see the list of available command line arguments. These include:
+
+1. `-o`: Output directory. By default it is equal to `pwd`.
+2. `-i`: Input file. Mandatory
+3. `-t`: Number of Threads. The default (0) is equal to hardware concurrency.
+4. `-b`: Bucket size: Chunk size for rendering an image.
 
 The input file has the following format:
 ```xml
