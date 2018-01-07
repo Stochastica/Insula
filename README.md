@@ -37,7 +37,7 @@ usage, see `doc/examples`.
 
 ### Types
 
-1. `SceneTest`: The best type to test out your gradients! Nothing needs to be
+1. `Test`: The best type to test out your gradients! Nothing needs to be
 	specified.
 2. `Mandelbrot`: Renders the Mandelbrot set. A Mandelbrot object must be
 	supplied, which has the following format
@@ -45,9 +45,8 @@ usage, see `doc/examples`.
 "Mandelbrot": {
 	"centre": [<X>, <Y>],
 	"radius": ...,
-	"iterations": <Max number of iterations>,
-	"escapeRadius": <Max radius>,
-	"cycles": <Colour cycles>
+	"iterations": <Max-iterations>,
+	"escapeRadius": <Max-radius>,
 }
 ```
 
