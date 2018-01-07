@@ -2,7 +2,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/program_options.hpp>
 
 /**
@@ -31,7 +31,7 @@ bool processFile(
 {
 	namespace bpt = boost::property_tree;
 	bpt::ptree tree;
-	bpt::read_xml(file.c_str(), tree);
+	bpt::read_json(file.c_str(), tree);
 
 	int i = 0; // Scene id
 
@@ -48,11 +48,10 @@ bool processFile(
 		Image image;
 		// Load image
 		{
-			auto parameters = scene.second.get_child_optional("parameters");
 			fileName = "scene" + std::to_string(i) + ".png";
 			image.width = 800;
 			image.height = 600;
-			if (parameters)
+			if (auto parameters = scene.second.get_child_optional("parameters"))
 			{
 				fileName = parameters->get<std::string>("filename", fileName);
 				type = parameters->get<std::string>("type", type);
@@ -66,6 +65,8 @@ bool processFile(
 		}
 		std::cout << "Scene name: " << fileName
 			<< ", Type: " << type << std::endl;
+
+		// Read Gradient
 
 		typedef boost::gil::rgba8_image_t::value_type Pixel;
 		static_assert(sizeof(Pixel) == sizeof(uint32_t), "Must be of RGBA8 format");

@@ -1,0 +1,28 @@
+{
+	"scene": {
+		"parameters": {
+			"filename": "mandelbrot.png",
+			"type": "Mandelbrot",
+			"imgWidth": 800,
+			"imgHeight": 600
+		},
+		"Mandelbrot": {
+			"iterations": 1024,
+			"escapeRadius": 1048576,
+			"cycles": 32
+		}	
+	},
+	"scene": {
+		"parameters": {
+			"filename": "mandelbrotZoomed.png",
+			"type": "Mandelbrot",
+			"imgWidth": 800,
+			"imgHeight": 600
+		},
+		"Mandelbrot": {
+			"centreX": 0.16125,
+			"centreY": 0.638438,
+			"radius": 0.02
+		}
+	}
+}

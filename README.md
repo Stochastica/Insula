@@ -18,31 +18,33 @@ to see the list of available command line arguments. These include:
 4. `-b`: Bucket size: Chunk size for rendering an image.
 
 The input file has the following format:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<scene>
-	<parameters>
-		<filename>...</filename>
-		<type>Type</type>
-		<imgWidth>Width</imgWidth>
-		<imgHeight>Height</imgHeight>
-	</parameters>
-	...objects...
-</scene>
+```json
+{
+	"scene": {
+		"parameters": {
+			"filename": "<File-Name>",
+			"type": "<Type>",
+			"imgWidth": <Image Width>,
+			"imgHeight": <Image Height>
+		},
+		<objects...>
+	},
+	...
+}
 ```
 Currently the only available type is `Mandelbrot`. In which case a
-`<Mandelbrot>` object must be supplied. It has the following format
-```xml
-<Mandelbrot>
-	<centreX>...</centreX>
-	<centreY>...</centreY>
-	<radius>...</radius>
-	<iterations>...</iterations>
-	<escapeRadius>...</escapeRadius>
-	<cycles>...</cycles>
-</Mandelbrot>
+Mandelbrot object must be supplied. It has the following format
+```json
+"Mandelbrot": {
+	"centreX": ...,
+	"centreY": ...,
+	"radius": ...,
+	"iterations": <Max number of iterations>,
+	"escapeRadius": <Max radius>,
+	"cycles": <Colour cycles>
+}
 ```
-Note: All arguments except for `<type>` have default values.
+Note: All arguments except for `"type"` have default values.
 
 For example of usage, see `doc/examples`.
 
