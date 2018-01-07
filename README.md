@@ -31,8 +31,16 @@ The input file has the following format:
 	...
 }
 ```
-Currently the only available type is `Mandelbrot`. In which case a
-Mandelbrot object must be supplied. It has the following format
+
+Note: All arguments except for `"type"` have default values. For example of
+usage, see `doc/examples`.
+
+### Types
+
+1. `SceneTest`: The best type to test out your gradients! Nothing needs to be
+	specified.
+2. `Mandelbrot`: Renders the Mandelbrot set. A Mandelbrot object must be
+	supplied, which has the following format
 ```json
 "Mandelbrot": {
 	"centre": [<X>, <Y>],
@@ -42,9 +50,27 @@ Mandelbrot object must be supplied. It has the following format
 	"cycles": <Colour cycles>
 }
 ```
-Note: All arguments except for `"type"` have default values.
 
-For example of usage, see `doc/examples`.
+### Gradients
+
+A gradient is a object that influences the drawing of other objects. It has
+the format
+```json
+"gradient": {
+	"nOut": <Number of Samples>,
+	"colors": [
+		<Control>, <R>, <G>, <B>, <A>,
+		<Control>, <R>, <G>, <B>, <A>,
+		...
+	]
+},
+```
+To improve performance, the gradient will be sampled uniformly with `nOut`
+samples and the result will use linear interpolation.
+
+Each color point in `colors` have 5 values within the range `[0,1]`: Control is
+the independent variable, and `R,G,B,A` are the dependent variables.
+Barycentric rational interpolation is used to interpolate the gradient.
 
 ## Building
 

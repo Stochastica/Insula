@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/program_options.hpp>
 
@@ -15,7 +14,9 @@
 #include <boost/gil/extension/io/png_io.hpp>
 
 #include "integration.hpp"
+#include "core/io.hpp"
 #include "scene/Mandelbrot.hpp"
+#include "scene/SceneTest.hpp"
 
 #define EXIT_NORMAL 0
 #define EXIT_FAILURE 1
@@ -23,40 +24,6 @@
 namespace ins
 {
 
-template <typename T>
-std::vector<T> ptree_getArray
-(
-  boost::property_tree::ptree const& tree,
-  boost::property_tree::ptree::key_type const& key
-)
-{
-	std::vector<T> result;
-	for (auto& item: tree.get_child(key))
-		result.push_back(item.second.get_value<T>());
-	return result;
-}
-/**
- * @brief Reads a json array from a property tree
- */
-template <typename T>
-boost::optional<std::vector<T>> ptree_getArray_optional
-                             (
-                               boost::property_tree::ptree const& tree,
-                               boost::property_tree::ptree::key_type const& key
-                             )
-{
-	if (auto child = tree.get_child_optional(key))
-	{
-		std::vector<T> result;
-		for (auto& item: child.get())
-			result.push_back(item.second.get_value<T>());
-		return result;
-	}
-	else
-	{
-		return boost::optional<std::vector<T>>();
-	}
-}
 
 bool processFile(
   boost::filesystem::path outputDir,
@@ -113,6 +80,7 @@ bool processFile(
 
 		if (type == "Mandelbrot")
 		{
+			Gradient gradient = readGradient(scene.second, "gradient");
 			real centreX = -.7;
 			real centreY = 0;
 			real radius = 1.5;
@@ -129,15 +97,21 @@ bool processFile(
 				}
 				radius = tree->get<real>("radius", radius);
 				iterations = tree->get<int>("iterations", iterations);
-				cycles = tree->get<int>("cycles", cycles);
 				escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
 			}
 			real diffY = radius * (image.height / (real) image.width);
-			Mandelbrot m = Mandelbrot(image.width, image.height,
+			Mandelbrot m = Mandelbrot(&gradient, image.width, image.height,
 			                          complex(centreX - radius, centreY - diffY),
 			                          complex(centreX + radius, centreY + diffY),
-			                          iterations, cycles, escapeRadius);
+			                          iterations, escapeRadius);
 			Sampler s = Sampler(image.width, image.height, &m);
+			render(&image, pp, &s);
+		}
+		else if (type == "Test")
+		{
+			Gradient gradient = readGradient(scene.second, "gradient");
+			SceneTest st(&gradient);
+			Sampler s = Sampler(image.width, image.height, &st);
 			render(&image, pp, &s);
 		}
 		else
