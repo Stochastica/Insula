@@ -24,8 +24,7 @@ The input file has the following format:
 		"parameters": {
 			"filename": "<File-Name>",
 			"type": "<Type>",
-			"imgWidth": <Image Width>,
-			"imgHeight": <Image Height>
+			"dimensions": [<Width>, <Height>]
 		},
 		<objects...>
 	},
@@ -36,8 +35,7 @@ Currently the only available type is `Mandelbrot`. In which case a
 Mandelbrot object must be supplied. It has the following format
 ```json
 "Mandelbrot": {
-	"centreX": ...,
-	"centreY": ...,
+	"centre": [<X>, <Y>],
 	"radius": ...,
 	"iterations": <Max number of iterations>,
 	"escapeRadius": <Max radius>,

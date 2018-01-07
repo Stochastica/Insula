@@ -3,8 +3,7 @@
 		"parameters": {
 			"filename": "mandelbrot.png",
 			"type": "Mandelbrot",
-			"imgWidth": 800,
-			"imgHeight": 600
+			"dimensions": [800, 600]
 		},
 		"Mandelbrot": {
 			"iterations": 1024,
@@ -16,12 +15,10 @@
 		"parameters": {
 			"filename": "mandelbrotZoomed.png",
 			"type": "Mandelbrot",
-			"imgWidth": 800,
-			"imgHeight": 600
+			"dimensions": [800, 600]
 		},
 		"Mandelbrot": {
-			"centreX": 0.16125,
-			"centreY": 0.638438,
+			"centre": [0.16125, 0.638438],
 			"radius": 0.02
 		}
 	}

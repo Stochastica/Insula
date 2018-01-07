@@ -23,6 +23,41 @@
 namespace ins
 {
 
+template <typename T>
+std::vector<T> ptree_getArray
+(
+  boost::property_tree::ptree const& tree,
+  boost::property_tree::ptree::key_type const& key
+)
+{
+	std::vector<T> result;
+	for (auto& item: tree.get_child(key))
+		result.push_back(item.second.get_value<T>());
+	return result;
+}
+/**
+ * @brief Reads a json array from a property tree
+ */
+template <typename T>
+boost::optional<std::vector<T>> ptree_getArray_optional
+                             (
+                               boost::property_tree::ptree const& tree,
+                               boost::property_tree::ptree::key_type const& key
+                             )
+{
+	if (auto child = tree.get_child_optional(key))
+	{
+		std::vector<T> result;
+		for (auto& item: child.get())
+			result.push_back(item.second.get_value<T>());
+		return result;
+	}
+	else
+	{
+		return boost::optional<std::vector<T>>();
+	}
+}
+
 bool processFile(
   boost::filesystem::path outputDir,
   boost::filesystem::path file,
@@ -55,6 +90,11 @@ bool processFile(
 			{
 				fileName = parameters->get<std::string>("filename", fileName);
 				type = parameters->get<std::string>("type", type);
+				if (auto dimensions = ptree_getArray_optional<int>(scene.second, "dimensions"))
+				{
+					image.width = dimensions.get()[0];
+					image.height = dimensions.get()[1];
+				}
 				image.width = parameters->get<int>("imgWidth", image.width);
 				image.height = parameters->get<int>("imgHeight", image.height);
 			}
@@ -64,7 +104,7 @@ bool processFile(
 			image.pixelsA = new uint8_t[image.width * image.height];
 		}
 		std::cout << "Scene name: " << fileName
-			<< ", Type: " << type << std::endl;
+		          << ", Type: " << type << std::endl;
 
 		// Read Gradient
 
@@ -82,8 +122,11 @@ bool processFile(
 
 			if (auto tree = scene.second.get_child_optional("Mandelbrot"))
 			{
-				centreX = tree->get<real>("centreX", centreX);
-				centreY = tree->get<real>("centreY", centreY);
+				if (auto centre = ptree_getArray_optional<real>(tree.get(), "centre"))
+				{
+					centreX = centre.get()[0];
+					centreY = centre.get()[1];
+				}
 				radius = tree->get<real>("radius", radius);
 				iterations = tree->get<int>("iterations", iterations);
 				cycles = tree->get<int>("cycles", cycles);
