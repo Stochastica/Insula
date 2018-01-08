@@ -66,6 +66,26 @@ Each color point in `colors` have 5 values within the range `[0,1]`: Control is
 the independent variable, and `R,G,B,A` are the dependent variables.
 Barycentric rational interpolation is used to interpolate the gradient.
 
+### Sampler
+
+There are two types of samplers available. To explicitly use a sampler, add
+```json
+"sampler": {
+	"type": <Type>,
+	...
+}
+```
+1. "Simple": 1 sample/pixel sampler.
+2. "Super": Several samples/pixel.
+```json
+"sampler": {
+	"type": "Super",
+	"spp": <Samples-per-pixel>,
+	"seed": <Random-seed>
+},
+```
+![Simple vs Super](doc/supersampling.png)
+
 ## Building
 
 It is best to do an out of source build at `build/` directory. Create a

@@ -8,14 +8,6 @@
 namespace ins
 {
 
-Color4 Sampler::at(Vector2i const& v) const
-{
-	complex z(
-	  v.x() / (real) width,
-	  v.y() / (real) height
-	);
-	return scene->sample(z);
-}
 void render(Image* const image, TaskParameters const& pp,
             Sampler* const sampler)
 {

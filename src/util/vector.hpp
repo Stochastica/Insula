@@ -75,6 +75,24 @@ operator*(T l, Vector4<T> const& v) noexcept
 {
 	return Vector4<T>(l * v(0), l * v(1), l * v(2), l * v(3));
 }
+template <typename T> inline Vector4<T>&
+operator+=(Vector4<T>& v0, Vector4<T> const& v1) noexcept
+{
+	v0(0) += v1(0);
+	v0(1) += v1(1);
+	v0(2) += v1(2);
+	v0(3) += v1(3);
+	return v0;
+}
+template <typename T> inline Vector4<T>&
+operator*=(Vector4<T>& v, T l) noexcept
+{
+	v(0) *= l;
+	v(1) *= l;
+	v(2) *= l;
+	v(3) *= l;
+	return v;
+}
 template <typename T> constexpr Vector4<T>
 clamp01(Vector4<T> const& v) noexcept
 {

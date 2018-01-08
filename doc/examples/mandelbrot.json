@@ -2,6 +2,10 @@
 	"filename": "mandelbrot.png",
 	"type": "Mandelbrot",
 	"dimensions": [800, 600],
+	"sampler": {
+		"type": "Super",
+		"spp": 25
+	},
 	"gradient": {
 		"nOut": 64,
 		"colors": [

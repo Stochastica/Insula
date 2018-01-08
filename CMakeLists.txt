@@ -26,6 +26,7 @@ endif()
 set(FileSource
 	src/main.cpp
 	src/integration.cpp
+	src/sampling.cpp
 	src/core/Gradient.cpp
 	src/scene/SceneTest.cpp
 	src/scene/Mandelbrot.cpp

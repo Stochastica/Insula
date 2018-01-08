@@ -1,4 +1,7 @@
 {
 	"type": "Test",
-	"dimensions": [800, 600]
+	"dimensions": [800, 600],
+	"sampler": {
+		"type": "Simple"
+	}
 }

@@ -27,11 +27,13 @@ namespace ins
 
 bool processFile(
   boost::filesystem::path output,
-  boost::property_tree::ptree const& scene,
+  boost::property_tree::ptree const& ptree,
   TaskParameters const& pp
 )
 {
 	namespace bpt = boost::property_tree;
+
+	bool flag = false;
 
 	std::string type; // Scene type
 	Image image;
@@ -39,25 +41,33 @@ bool processFile(
 	{
 		image.width = 800;
 		image.height = 600;
-		if (auto dimensions = ptree_getArray_optional<int>(scene, "dimensions"))
+		if (auto dimensions = ptree_getArray_optional<int>(ptree, "dimensions"))
 		{
 			image.width = dimensions.get()[0];
 			image.height = dimensions.get()[1];
 		}
-		type = scene.get<std::string>("type", type);
+		type = ptree.get<std::string>("type", type);
 		image.pixelsR = new uint8_t[image.width * image.height];
 		image.pixelsG = new uint8_t[image.width * image.height];
 		image.pixelsB = new uint8_t[image.width * image.height];
 		image.pixelsA = new uint8_t[image.width * image.height];
 	}
-	// Read Gradient
+
+	std::shared_ptr<Scene> scene;
+	std::shared_ptr<Sampler> sampler;
 
 	typedef boost::gil::rgba8_image_t::value_type Pixel;
 	static_assert(sizeof(Pixel) == sizeof(uint32_t), "Must be of RGBA8 format");
 
-	if (type == "Mandelbrot")
+	Gradient gradient = readGradient(ptree, "gradient");
+
+	// Load Scene
+	if (type == "Test")
 	{
-		Gradient gradient = readGradient(scene, "gradient");
+		scene = std::shared_ptr<Scene>(new SceneTest(&gradient));
+	}
+	else if (type == "Mandelbrot")
+	{
 		real centreX = -.7;
 		real centreY = 0;
 		real radius = 1.5;
@@ -65,7 +75,7 @@ bool processFile(
 		int cycles = 16;
 		real escapeRadius = 20;
 
-		if (auto tree = scene.get_child_optional("Mandelbrot"))
+		if (auto tree = ptree.get_child_optional("Mandelbrot"))
 		{
 			if (auto centre = ptree_getArray_optional<real>(tree.get(), "centre"))
 			{
@@ -77,26 +87,43 @@ bool processFile(
 			escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
 		}
 		real diffY = radius * (image.height / (real) image.width);
-		Mandelbrot m = Mandelbrot(&gradient, image.width, image.height,
-		                          complex(centreX - radius, centreY - diffY),
-		                          complex(centreX + radius, centreY + diffY),
-		                          iterations, escapeRadius);
-		Sampler s = Sampler(image.width, image.height, &m);
-		render(&image, pp, &s);
-	}
-	else if (type == "Test")
-	{
-		Gradient gradient = readGradient(scene, "gradient");
-		SceneTest st(&gradient);
-		Sampler s = Sampler(image.width, image.height, &st);
-		render(&image, pp, &s);
+		scene = std::shared_ptr<Scene>(new Mandelbrot(&gradient, image.width, image.height,
+		                               complex(centreX - radius, centreY - diffY),
+		                               complex(centreX + radius, centreY + diffY),
+		                               iterations, escapeRadius));
 	}
 	else
 	{
 		std::cerr << "Fatal: Unknown Scene type: " << type << std::endl;
-		return false;
+		goto exit;
 	}
 
+	// Load sampler
+	if (auto tSampler = ptree.get_child_optional("sampler"))
+	{
+		std::string type = tSampler->get<std::string>("type");
+		if (type == "Simple")
+		{
+			sampler = std::shared_ptr<Sampler>(new SamplerSimple(image.width, image.height, scene));
+		}
+		else if (type == "Super")
+		{
+			sampler = std::shared_ptr<Sampler>(new SamplerSuper(image.width, image.height, scene,
+			                                   tSampler->get<int>("spp", 8),
+			                                   tSampler->get<unsigned long>("seed", 0)
+			                                                   ));
+		}
+		else
+		{
+			std::cerr << "Fatal: Unknown Sampler type: " << type << std::endl;
+			goto exit;
+		}
+	}
+	else
+	{
+		sampler = std::shared_ptr<Sampler>(new SamplerSuper(image.width, image.height, scene, 8, 0));
+	}
+	render(&image, pp, sampler.get());
 	boost::gil::png_write_view(output.string(),
 	                           boost::gil::planar_rgba_view(image.width,
 	                               image.height,
@@ -107,12 +134,13 @@ bool processFile(
 	                               image.width)
 	                          );
 
+exit:
 	delete[] image.pixelsR;
 	delete[] image.pixelsG;
 	delete[] image.pixelsB;
 	delete[] image.pixelsA;
 
-	return true;
+	return flag;
 }
 
 }
@@ -137,7 +165,7 @@ int main(int argc, char* argv[])
 		("output,o", bpo::value<std::string>()->default_value(""), "Output file")
 		("input,i", bpo::value<std::string>(), "Input File")
 		("threads,t", bpo::value<int>()->default_value(0, "Automatic"), "Number of Threads")
-		("bucketsize,b", bpo::value<int>()->default_value(16), "Size of Rendering Chunk")
+		("bucketsize,b", bpo::value<int>()->default_value(32), "Size of Rendering Chunk")
 		;
 		bpo::store(bpo::parse_command_line(argc, argv, desc), options);
 
@@ -166,10 +194,10 @@ int main(int argc, char* argv[])
 	pp.nThreads = options["threads"].as<int>();
 	pp.bucketSize = options["bucketsize"].as<int>();
 
-	boost::property_tree::ptree scene;
-	boost::property_tree::read_json(input.c_str(), scene);
+	boost::property_tree::ptree ptree;
+	boost::property_tree::read_json(input.c_str(), ptree);
 
-	if (processFile(output, scene, pp))
+	if (processFile(output, ptree, pp))
 		return EXIT_NORMAL;
 	else
 		return EXIT_FAILURE;

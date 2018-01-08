@@ -3,34 +3,19 @@
 
 #include <functional>
 
+#include "sampling.hpp"
 #include "core/Image.hpp"
 #include "core/TaskParameters.hpp"
 #include "core/insula.hpp"
-#include "scene/Scene.hpp"
 
 namespace ins
 {
 
-class Sampler
-{
-public:
-	Sampler(int width, int height, Scene* scene):
-		width(width), height(height),
-		scene(scene)
-	{}
-
-	Color4 at(Vector2i const&) const;
-private:
-	int width, height;
-	Scene* scene;
-};
-
-
 /**
+ * @brief Renders the image using the given sampler.
  * @warning Image must be pre-allocated
  */
-void render(Image* const, TaskParameters const&,
-            Sampler* const);
+void render(Image* const, TaskParameters const&, Sampler* const);
 
 
 } // namespace ins

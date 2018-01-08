@@ -10,7 +10,7 @@ namespace ins
 class Scene
 {
 public:
-	~Scene() = default;
+	virtual ~Scene() = default;
 	/**
 	 * @brief Obtain 1 sample from the coordinate z.
 	 * @param[in] A complex number within [0,1] x [0,1]
