@@ -7,7 +7,7 @@ set(CMAKE_BINARY_DIR   ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR})
 
-find_package(Boost 1.58.0 COMPONENTS
+find_package(Boost 1.65.0 COMPONENTS
 	filesystem
 	program_options
 	system

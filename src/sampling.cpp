@@ -9,8 +9,8 @@ namespace ins
 Color4 SamplerSimple::at(Vector2i const& v) const
 {
 	complex z(
-	  v.x() / (real) width,
-	  1 - v.y() / (real) height
+	  v.x() * invWidth,
+	  1 - v.y() * invHeight
 	);
 	return scene->sample(z);
 }
@@ -41,8 +41,8 @@ Color4 SamplerSuper::at(Vector2i const& v) const
 	for (int i = 0; i < spp; ++i)
 	{
 		complex z(
-		  (v.x() + samplesX[i]) / (real) width,
-		  1 - (v.y() + samplesY[i]) / (real) height
+		  (v.x() + samplesX[i]) * invWidth,
+		  1 - (v.y() + samplesY[i]) * invHeight
 		);
 		sample += scene->sample(z);
 	}
