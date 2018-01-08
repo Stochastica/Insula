@@ -10,7 +10,7 @@ Color4 SamplerSimple::at(Vector2i const& v) const
 {
 	complex z(
 	  v.x() / (real) width,
-	  v.y() / (real) height
+	  1 - v.y() / (real) height
 	);
 	return scene->sample(z);
 }
@@ -42,7 +42,7 @@ Color4 SamplerSuper::at(Vector2i const& v) const
 	{
 		complex z(
 		  (v.x() + samplesX[i]) / (real) width,
-		  (v.y() + samplesY[i]) / (real) height
+		  1 - (v.y() + samplesY[i]) / (real) height
 		);
 		sample += scene->sample(z);
 	}

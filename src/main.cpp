@@ -15,6 +15,7 @@
 
 #include "integration.hpp"
 #include "core/io.hpp"
+#include "scene/Julia.hpp"
 #include "scene/Mandelbrot.hpp"
 #include "scene/SceneTest.hpp"
 
@@ -90,6 +91,38 @@ bool processFile(
 		scene = std::shared_ptr<Scene>(new Mandelbrot(&gradient, image.width, image.height,
 		                               complex(centreX - radius, centreY - diffY),
 		                               complex(centreX + radius, centreY + diffY),
+		                               iterations, escapeRadius));
+	}
+	else if (type == "Julia")
+	{
+		real centreX = 0;
+		real centreY = 0;
+		real radius = 1.5;
+		int iterations = 64;
+		int cycles = 16;
+		real escapeRadius = 20;
+		complex c(-0.8,0.156);
+
+		if (auto tree = ptree.get_child_optional("Julia"))
+		{
+			if (auto centre = ptree_getArray_optional<real>(tree.get(), "centre"))
+			{
+				centreX = centre.get()[0];
+				centreY = centre.get()[1];
+			}
+			radius = tree->get<real>("radius", radius);
+			iterations = tree->get<int>("iterations", iterations);
+			escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
+			if (auto tC = ptree_getArray_optional<real>(tree.get(), "c"))
+			{
+				c = complex(tC.get()[0], tC.get()[1]);
+			}
+		}
+		real diffY = radius * (image.height / (real) image.width);
+		scene = std::shared_ptr<Scene>(new Julia(&gradient, image.width, image.height,
+		                               complex(centreX - radius, centreY - diffY),
+		                               complex(centreX + radius, centreY + diffY),
+		                               c,
 		                               iterations, escapeRadius));
 	}
 	else

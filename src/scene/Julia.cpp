@@ -1,19 +1,18 @@
-#include "Mandelbrot.hpp"
+#include "Julia.hpp"
 
 namespace ins
 {
 
-Color4 Mandelbrot::sample(complex z0) const
+Color4 Julia::sample(complex in) const
 {
 	// Transform z0 into the region
-	complex c(
-		z0.real() * (max.real() - min.real()) + min.real(),
-		z0.imag() * (max.imag() - min.imag()) + min.imag()
+	complex z(
+		in.real() * (max.real() - min.real()) + min.real(),
+		in.imag() * (max.imag() - min.imag()) + min.imag()
 	);
 	// Escape Time algorithm (Fractional)
 	int i = 0; // NIterations
 
-	complex z(0, 0);
 	while (std::norm(z) < escapeRadius && i < iterations)
 	{
 		z = z * z + c;
@@ -40,5 +39,4 @@ Color4 Mandelbrot::sample(complex z0) const
 	}
 	return color;
 }
-
 } // namespace ins

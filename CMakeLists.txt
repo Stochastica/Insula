@@ -28,8 +28,9 @@ set(FileSource
 	src/integration.cpp
 	src/sampling.cpp
 	src/core/Gradient.cpp
-	src/scene/SceneTest.cpp
+	src/scene/Julia.cpp
 	src/scene/Mandelbrot.cpp
+	src/scene/SceneTest.cpp
 	)
 
 add_executable(Insula ${FileSource})

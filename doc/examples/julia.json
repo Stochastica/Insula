@@ -1,9 +1,9 @@
 {
-	"type": "Mandelbrot",
+	"type": "Julia",
 	"dimensions": [800, 600],
 	"sampler": {
 		"type": "Super",
-		"spp": 25
+		"spp": 12
 	},
 	"gradient": {
 		"nOut": 64,
@@ -17,8 +17,9 @@
 			    1,     0,     0,     0, 1
 		]
 	},
-	"Mandelbrot": {
-		"iterations": 1024,
-		"escapeRadius": 1048576
+	"Julia": {
+		"iterations": 20488888888,
+		"escapeRadius": 1048576,
+		"c": [-0.8,0.156]
 	}	
 }

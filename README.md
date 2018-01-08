@@ -3,6 +3,7 @@
 Simple Multi-threaded Fractal Rendering program
 
 ![Mandelbrot](doc/mandelbrot.png)
+![Julia](doc/julia.png)
 
 ## Usage
 
@@ -42,6 +43,14 @@ usage, see `doc/examples`.
 	"radius": ...,
 	"iterations": <Max-iterations>,
 	"escapeRadius": <Max-radius>,
+}
+```
+3. `Julia`: Renders the Julia set. The arguments are the same for Mandelbrot
+set except with the `c` parameter:
+```json
+"Julia": {
+	...
+	"c": [<X>, <Y>]
 }
 ```
 
