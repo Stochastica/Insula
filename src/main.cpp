@@ -26,116 +26,91 @@ namespace ins
 
 
 bool processFile(
-  boost::filesystem::path outputDir,
-  boost::filesystem::path file,
+  boost::filesystem::path output,
+  boost::property_tree::ptree const& scene,
   TaskParameters const& pp
 )
 {
 	namespace bpt = boost::property_tree;
-	bpt::ptree tree;
-	bpt::read_json(file.c_str(), tree);
 
-	int i = 0; // Scene id
-
-	for (auto const& scene: tree)
+	std::string type; // Scene type
+	Image image;
+	// Load image
 	{
-		if (scene.first != "scene")
+		image.width = 800;
+		image.height = 600;
+		if (auto dimensions = ptree_getArray_optional<int>(scene, "dimensions"))
 		{
-			std::cerr << "Warning: Unknown class " << scene.first << std::endl;
-			continue;
+			image.width = dimensions.get()[0];
+			image.height = dimensions.get()[1];
 		}
-
-		std::string fileName;
-		std::string type; // Scene type
-		Image image;
-		// Load image
-		{
-			fileName = "scene" + std::to_string(i) + ".png";
-			image.width = 800;
-			image.height = 600;
-			if (auto parameters = scene.second.get_child_optional("parameters"))
-			{
-				fileName = parameters->get<std::string>("filename", fileName);
-				type = parameters->get<std::string>("type", type);
-				if (auto dimensions = ptree_getArray_optional<int>(scene.second, "dimensions"))
-				{
-					image.width = dimensions.get()[0];
-					image.height = dimensions.get()[1];
-				}
-				image.width = parameters->get<int>("imgWidth", image.width);
-				image.height = parameters->get<int>("imgHeight", image.height);
-			}
-			image.pixelsR = new uint8_t[image.width * image.height];
-			image.pixelsG = new uint8_t[image.width * image.height];
-			image.pixelsB = new uint8_t[image.width * image.height];
-			image.pixelsA = new uint8_t[image.width * image.height];
-		}
-		std::cout << "Scene name: " << fileName
-		          << ", Type: " << type << std::endl;
-
-		// Read Gradient
-
-		typedef boost::gil::rgba8_image_t::value_type Pixel;
-		static_assert(sizeof(Pixel) == sizeof(uint32_t), "Must be of RGBA8 format");
-
-		if (type == "Mandelbrot")
-		{
-			Gradient gradient = readGradient(scene.second, "gradient");
-			real centreX = -.7;
-			real centreY = 0;
-			real radius = 1.5;
-			int iterations = 64;
-			int cycles = 16;
-			real escapeRadius = 20;
-
-			if (auto tree = scene.second.get_child_optional("Mandelbrot"))
-			{
-				if (auto centre = ptree_getArray_optional<real>(tree.get(), "centre"))
-				{
-					centreX = centre.get()[0];
-					centreY = centre.get()[1];
-				}
-				radius = tree->get<real>("radius", radius);
-				iterations = tree->get<int>("iterations", iterations);
-				escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
-			}
-			real diffY = radius * (image.height / (real) image.width);
-			Mandelbrot m = Mandelbrot(&gradient, image.width, image.height,
-			                          complex(centreX - radius, centreY - diffY),
-			                          complex(centreX + radius, centreY + diffY),
-			                          iterations, escapeRadius);
-			Sampler s = Sampler(image.width, image.height, &m);
-			render(&image, pp, &s);
-		}
-		else if (type == "Test")
-		{
-			Gradient gradient = readGradient(scene.second, "gradient");
-			SceneTest st(&gradient);
-			Sampler s = Sampler(image.width, image.height, &st);
-			render(&image, pp, &s);
-		}
-		else
-		{
-			std::cerr << "Unknown Scene type\n";
-			continue;
-		}
-
-		boost::gil::png_write_view((outputDir / fileName).string(),
-		                           boost::gil::planar_rgba_view(image.width,
-		                               image.height,
-		                               image.pixelsR,
-		                               image.pixelsG,
-		                               image.pixelsB,
-		                               image.pixelsA,
-		                               image.width)
-		                          );
-
-		delete[] image.pixelsR;
-		delete[] image.pixelsG;
-		delete[] image.pixelsB;
-		delete[] image.pixelsA;
-		++i;
+		type = scene.get<std::string>("type", type);
+		image.pixelsR = new uint8_t[image.width * image.height];
+		image.pixelsG = new uint8_t[image.width * image.height];
+		image.pixelsB = new uint8_t[image.width * image.height];
+		image.pixelsA = new uint8_t[image.width * image.height];
 	}
+	// Read Gradient
+
+	typedef boost::gil::rgba8_image_t::value_type Pixel;
+	static_assert(sizeof(Pixel) == sizeof(uint32_t), "Must be of RGBA8 format");
+
+	if (type == "Mandelbrot")
+	{
+		Gradient gradient = readGradient(scene, "gradient");
+		real centreX = -.7;
+		real centreY = 0;
+		real radius = 1.5;
+		int iterations = 64;
+		int cycles = 16;
+		real escapeRadius = 20;
+
+		if (auto tree = scene.get_child_optional("Mandelbrot"))
+		{
+			if (auto centre = ptree_getArray_optional<real>(tree.get(), "centre"))
+			{
+				centreX = centre.get()[0];
+				centreY = centre.get()[1];
+			}
+			radius = tree->get<real>("radius", radius);
+			iterations = tree->get<int>("iterations", iterations);
+			escapeRadius = tree->get<real>("escapeRadius", escapeRadius);
+		}
+		real diffY = radius * (image.height / (real) image.width);
+		Mandelbrot m = Mandelbrot(&gradient, image.width, image.height,
+		                          complex(centreX - radius, centreY - diffY),
+		                          complex(centreX + radius, centreY + diffY),
+		                          iterations, escapeRadius);
+		Sampler s = Sampler(image.width, image.height, &m);
+		render(&image, pp, &s);
+	}
+	else if (type == "Test")
+	{
+		Gradient gradient = readGradient(scene, "gradient");
+		SceneTest st(&gradient);
+		Sampler s = Sampler(image.width, image.height, &st);
+		render(&image, pp, &s);
+	}
+	else
+	{
+		std::cerr << "Fatal: Unknown Scene type: " << type << std::endl;
+		return false;
+	}
+
+	boost::gil::png_write_view(output.string(),
+	                           boost::gil::planar_rgba_view(image.width,
+	                               image.height,
+	                               image.pixelsR,
+	                               image.pixelsG,
+	                               image.pixelsB,
+	                               image.pixelsA,
+	                               image.width)
+	                          );
+
+	delete[] image.pixelsR;
+	delete[] image.pixelsG;
+	delete[] image.pixelsB;
+	delete[] image.pixelsA;
 
 	return true;
 }
@@ -159,9 +134,9 @@ int main(int argc, char* argv[])
 		bpo::options_description desc("Options");
 		desc.add_options()
 		("help,h", "Show help")
-		("output,o", bpo::value<std::string>()->default_value(boost::filesystem::current_path().string(), "Current Directory"), "Output directory")
+		("output,o", bpo::value<std::string>()->default_value(""), "Output file")
 		("input,i", bpo::value<std::string>(), "Input File")
-		("threads,t", bpo::value<int>()->default_value(0), "Number of Threads")
+		("threads,t", bpo::value<int>()->default_value(0, "Automatic"), "Number of Threads")
 		("bucketsize,b", bpo::value<int>()->default_value(16), "Size of Rendering Chunk")
 		;
 		bpo::store(bpo::parse_command_line(argc, argv, desc), options);
@@ -171,25 +146,30 @@ int main(int argc, char* argv[])
 		 */
 		if (options.count("help"))
 		{
-			std::cout << desc << std::endl;
+			std::cout << INSULA_NAME << " " << INSULA_VERSION << std::endl
+			          << desc << std::endl;
 			return EXIT_NORMAL;
 		}
 	}
 
-	auto output = boost::filesystem::path(options["output"].as<std::string>());
+	namespace bfs = boost::filesystem;
 
-	if (!boost::filesystem::exists(output))
-	{
-		std::cerr << "Output Directory does not exist. Halt/\n";
-		return EXIT_FAILURE;
-	}
 	auto input = boost::filesystem::path(options["input"].as<std::string>());
+	auto outputFile = options["output"].as<std::string>();
+	bfs::path output;
+	if (outputFile == "")
+		output = bfs::path(input.stem().string() + ".png");
+	else
+		output = bfs::path(outputFile);
 
 	TaskParameters pp;
 	pp.nThreads = options["threads"].as<int>();
 	pp.bucketSize = options["bucketsize"].as<int>();
 
-	if (processFile(output, input, pp))
+	boost::property_tree::ptree scene;
+	boost::property_tree::read_json(input.c_str(), scene);
+
+	if (processFile(output, scene, pp))
 		return EXIT_NORMAL;
 	else
 		return EXIT_FAILURE;

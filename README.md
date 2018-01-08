@@ -12,7 +12,8 @@ Insula -h
 ```
 to see the list of available command line arguments. These include:
 
-1. `-o`: Output directory. By default it is equal to `pwd`.
+1. `-o`: Output file. By default is equal to input file name appended with
+	`.png`, to the current directory.
 2. `-i`: Input file. Mandatory
 3. `-t`: Number of Threads. The default (0) is equal to hardware concurrency.
 4. `-b`: Bucket size: Chunk size for rendering an image.
@@ -20,15 +21,9 @@ to see the list of available command line arguments. These include:
 The input file has the following format:
 ```json
 {
-	"scene": {
-		"parameters": {
-			"filename": "<File-Name>",
-			"type": "<Type>",
-			"dimensions": [<Width>, <Height>]
-		},
-		<objects...>
-	},
-	...
+	"type": "<Type>",
+	"dimensions": [<Width>, <Height>],
+	<objects...>
 }
 ```
 

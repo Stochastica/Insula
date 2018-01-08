@@ -1,0 +1,8 @@
+{
+	"type": "Mandelbrot",
+	"dimensions": [800, 600],
+	"Mandelbrot": {
+		"centre": [0.16125, 0.638438],
+		"radius": 0.02
+	}
+}

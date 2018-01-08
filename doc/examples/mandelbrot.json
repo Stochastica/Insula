@@ -1,36 +1,21 @@
 {
-	"scene": {
-		"parameters": {
-			"filename": "mandelbrot.png",
-			"type": "Mandelbrot",
-			"dimensions": [800, 600]
-		},
-		"gradient": {
-			"nOut": 64,
-			"colors": [
-				    0,     0,     0,     0, 1,
-				0.070, 0.188, 0.008, 0.191, 1,
-				0.230,     0, 0.664,     1, 1,
-				0.490,     1,     1, 0.926, 1,
-				0.713, 0.793, 0.418, 0.125, 1,
-				0.928, 0.391, 0.027,     0, 1,
-				    1,     0,     0,     0, 1
-			]
-		},
-		"Mandelbrot": {
-			"iterations": 1024,
-			"escapeRadius": 1048576
-		}	
+	"filename": "mandelbrot.png",
+	"type": "Mandelbrot",
+	"dimensions": [800, 600],
+	"gradient": {
+		"nOut": 64,
+		"colors": [
+			    0,     0,     0,     0, 1,
+			0.070, 0.188, 0.008, 0.191, 1,
+			0.230,     0, 0.664,     1, 1,
+			0.490,     1,     1, 0.926, 1,
+			0.713, 0.793, 0.418, 0.125, 1,
+			0.928, 0.391, 0.027,     0, 1,
+			    1,     0,     0,     0, 1
+		]
 	},
-	"scene": {
-		"parameters": {
-			"filename": "mandelbrotZoomed.png",
-			"type": "Mandelbrot",
-			"dimensions": [800, 600]
-		},
-		"Mandelbrot": {
-			"centre": [0.16125, 0.638438],
-			"radius": 0.02
-		}
-	}
+	"Mandelbrot": {
+		"iterations": 1024,
+		"escapeRadius": 1048576
+	}	
 }

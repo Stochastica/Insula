@@ -1,9 +1,4 @@
 {
-	"scene": {
-		"parameters": {
-			"filename": "test.png",
-			"type": "Test",
-			"dimensions": [800, 600]
-		}
-	}
+	"type": "Test",
+	"dimensions": [800, 600]
 }
